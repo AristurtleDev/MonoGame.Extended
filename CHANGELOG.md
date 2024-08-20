@@ -1,5 +1,25 @@
 # Changelog
 
+- [Changelog](#changelog)
+  - [\[Unreleased\]](#unreleased)
+  - [\[4.0.1\]](#401)
+  - [\[4.0.0\]](#400)
+    - [Added](#added)
+    - [Changed](#changed)
+    - [Removed](#removed)
+    - [Fixed](#fixed)
+  - [\[3.9.0-prerelease.4\]](#390-prerelease4)
+    - [Added](#added-1)
+    - [Changed](#changed-1)
+    - [Removed](#removed-1)
+  - [\[3.9.0-prerelease3\]](#390-prerelease3)
+    - [Added](#added-2)
+    - [Changed](#changed-2)
+    - [Deprecated](#deprecated)
+    - [Removed](#removed-2)
+    - [Fixed](#fixed-1)
+
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -11,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > Unreleased changes exist in the current `develop` branch but have not been pushed as either a stable or prerelease NuGet package.
 >
 
-## [4.0.1]
+## Version 4.0.1
 - `VortexModifier` now properly makes use of the `MaxSpeed` property. [@AristurtleDev](https://github.com/AristurtleDev)    [#921](https://github.com/craftworkgames/MonoGame.Extended/pull/921)
 - `rayNearDistance` and `rayFarDistance` are now properly swapped in `PrimitivesHelper.IntersectsSlab()`. [@AristurtleDev](https://github.com/AristurtleDev) [#922](https://github.com/craftworkgames/MonoGame.Extended/pull/922)
 - Resolved issue where an `ArgumentNullException` was thrown when loading BitmapFonts due to the `bmfFile.Path` value not being set. [@AristurtleDev](https://github.com/AristurtleDev) [#924](https://github.com/craftworkgames/MonoGame.Extended/pull/924)
@@ -22,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Vector2Extensions.Rotate` has been marked deprecated for MonoGame targets only (KNI and FNA still use this). With the release of MonoGame 3.8.2.1105, MonoGame now has a built in method for rotating a `Vector2`. [@AristurtleDev](https://github.com/AristurtleDev) [#926](https://github.com/craftworkgames/MonoGame.Extended/pull/926)
 -
 
-## [4.0.0]
+## Version 4.0.0
 ### Added
 - Added unit test for `PolyGon.Contains` to ensure consistency in expected return values for edge touching compared to MonoGame. [@AristurtleDev](https://github.com/AristurtleDev) [#871](https://github.com/craftworkgames/MonoGame.Extended/pull/871)
 - Added unit test for `BitmapFont.MeasureString` to validate that it correctly accounts for trailing whitespace. [@AristurtleDev](https://github.com/AristurtleDev) [#876](https://github.com/craftworkgames/MonoGame.Extended/pull/876)

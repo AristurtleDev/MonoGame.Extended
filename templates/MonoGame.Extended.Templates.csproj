@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ArtifactsPath>$(SolutionDirectory).artifacts/templates</ArtifactsPath>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <PackageId>MonoGame.Extended.Templates</PackageId>
+        <PackageType>Template</PackageType>
+        <PackageVersion>0.0.1</PackageVersion>
+        <PackageTags>MonoGame;Extended;MonoGame.Extended</PackageTags>
+
+        <Title>MonoGame Extended C# Project Templates</Title>
+        <Description>Contains C# project templates for MonoGame</Description>
+
+        <IncludeContentInPack>true</IncludeContentInPack>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <ContentTargetFolders>content</ContentTargetFolders>
+        <NoWarn>$(NoWarn);NU5128</NoWarn>
+        <NoDefaultExcludes>true</NoDefaultExcludes>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="content\**\*"
+            Exclude="content\**\bin\**;content\**\obj\**;content\**\*.sln" />
+        <Compile Remove="**\*" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="JsonPoke.MSBuild" Version="1.0.9">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <Target Name="UpdateDotnetToolsManifest" BeforeTargets="CoreBuild">
+        <ItemGroup>
+            <MonoGameProjects Inclue="**\*.csproj" />
+        </ItemGroup>
+
+        <ItemGroup>
+            <DotnetToolManifest Include="**\.config\dotnet-tools.json" />
+        </ItemGroup>
+
+
+        <JsonPoke JsonInputPath="%(DotnetToolManifest.Identity)"
+                  JPath="tools.dotnet-mgcb.version"
+                  JValue="$(MonoGameSupportedVersion)" />
+
+        <JsonPoke JsonInputPath="%(DotnetToolManifest.Identity)"
+                  JPath="tools.dotnet-mgcb-editor.version"
+                  JValue="$(MonoGameSupportedVersion)" />
+
+        <JsonPoke JsonInputPath="%(DotnetToolManifest.Identity)"
+                  JPath="tools.dotnet-mgcb-editor-windows.version"
+                  JValue="$(MonoGameSupportedVersion)" />
+
+        <JsonPoke JsonInputPath="%(DotnetToolManifest.Identity)"
+                  JPath="tools.dotnet-mgcb-editor-mac.version"
+                  JValue="$(MonoGameSupportedVersion)" />
+
+        <JsonPoke JsonInputPath="%(DotnetToolManifest.Identity)"
+                  JPath="tools.dotnet-mgcb-editor-linux.version"
+                  JValue="$(MonoGameSupportedVersion)" />
+    </Target>
+</Project>
