@@ -18,6 +18,7 @@ namespace MonoGame.Extended.Particles.Serialization
         /// <inheritdoc />
         public override bool CanConvert(Type typeToConvert) => typeToConvert == typeof(Profile);
 
+        /// <inheritdoc />
         public override Profile Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.StartObject)
@@ -186,30 +187,120 @@ namespace MonoGame.Extended.Particles.Serialization
             return Profile.Spray(direction, spread);
         }
 
+        /// <inheritdoc />
         public override void Write(Utf8JsonWriter writer, Profile value, JsonSerializerOptions options)
         {
             ArgumentNullException.ThrowIfNull(writer);
+            var type = value.GetType().ToString();
+            switch (type)
+            {
+                case nameof(PointProfile):
+                    WritePointProfile(ref writer, (PointProfile)value);
+                    break;
+
+                case nameof(LineProfile):
+                    WriteLineProfile(ref writer, (LineProfile)value);
+                    break;
+
+                case nameof(RingProfile):
+                    WriteRingProfile(ref writer, (RingProfile)value);
+                    break;
+
+                case nameof(BoxProfile):
+                    WriteBoxProfile(ref writer, (BoxProfile)value);
+                    break;
+
+                case nameof(BoxFillProfile):
+                    WriteBoxFillProfile(ref writer, (BoxFillProfile)value);
+                    break;
+
+                case nameof(BoxUniformProfile):
+                    WriteBoxUniformProfile(ref writer, (BoxUniformProfile)value);
+                    break;
+
+                case nameof(CircleProfile):
+                    WriteCircleProfile(ref writer, (CircleProfile)value);
+                    break;
+
+                case nameof(SprayProfile):
+                    WriteSprayProfile(ref writer, (SprayProfile)value);
+                    break;
+
+                default:
+                    throw new InvalidOperationException("Unknown profile type");
+            }
+        }
+
+        private static void WritePointProfile(ref Utf8JsonWriter writer, PointProfile value)
+        {
             writer.WriteStartObject();
             writer.WritePropertyName("type");
             writer.WriteStringValue(value.GetType().ToString());
             writer.WriteEndObject();
         }
 
-    }
-    // public class ProfileJsonConverter : BaseTypeJsonConverter<Profile>
-    // {
-    //     public ProfileJsonConverter()
-    //         : base(GetSupportedTypes(), nameof(Profile))
-    //     {
-    //     }
+        private static void WriteLineProfile(ref Utf8JsonWriter writer, LineProfile value)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("type", value.GetType().ToString());
+            writer.WriteString("axis", $"{value.Axis.X} {value.Axis.Y}");
+            writer.WriteNumber("length", value.Length);
+            writer.WriteEndObject();
+        }
 
-    //     private static IEnumerable<TypeInfo> GetSupportedTypes()
-    //     {
-    //         return typeof(Profile)
-    //             .GetTypeInfo()
-    //             .Assembly
-    //             .DefinedTypes
-    //             .Where(type => type.IsSubclassOf(typeof(Profile)) && !type.IsAbstract);
-    //     }
-    // }
+        private static void WriteRingProfile(ref Utf8JsonWriter writer, RingProfile value)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("type", value.GetType().ToString());
+            writer.WriteNumber("radius", value.Radius);
+            writer.WriteNumber("radiate", (int)value.Radiate);
+            writer.WriteEndObject();
+        }
+
+        private static void WriteBoxProfile(ref Utf8JsonWriter writer, BoxProfile value)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("type", value.GetType().ToString());
+            writer.WriteNumber("width", value.Width);
+            writer.WriteNumber("height", value.Height);
+            writer.WriteEndObject();
+        }
+
+        private static void WriteBoxFillProfile(ref Utf8JsonWriter writer, BoxFillProfile value)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("type", value.GetType().ToString());
+            writer.WriteNumber("width", value.Width);
+            writer.WriteNumber("height", value.Height);
+            writer.WriteEndObject();
+        }
+
+        private static void WriteBoxUniformProfile(ref Utf8JsonWriter writer, BoxUniformProfile value)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("type", value.GetType().ToString());
+            writer.WriteNumber("width", value.Width);
+            writer.WriteNumber("height", value.Height);
+            writer.WriteEndObject();
+        }
+
+        private static void WriteCircleProfile(ref Utf8JsonWriter writer, CircleProfile value)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("type", value.GetType().ToString());
+            writer.WriteNumber("radius", value.Radius);
+            writer.WriteNumber("radiate", (int)value.Radiate);
+            writer.WriteEndObject();
+
+        }
+
+        private static void WriteSprayProfile(ref Utf8JsonWriter writer, SprayProfile value)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("type", value.GetType().ToString());
+            writer.WriteString("direction", $"{value.Direction.X} {value.Direction.Y}");
+            writer.WriteNumber("spread", value.Spread);
+            writer.WriteEndObject();
+        }
+    }
 }
