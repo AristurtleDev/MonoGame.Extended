@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 
@@ -21,72 +20,98 @@ namespace MonoGame.Extended
     public struct HslColor : IEquatable<HslColor>, IComparable<HslColor>
     {
 
-        /// <summary>
-        /// The hue component of the color (in degrees) ranging from 0.0 to 360.0.
-        /// </summary>
-        public readonly float H;
+        private float _h;
+        private float _s;
+        private float _l;
 
         /// <summary>
-        /// The saturation component of the color, ranging from 0.0 to 1.0.
+        /// The hue component value (in degrees) of the color ranging from 0.0 to 360.0.
         /// </summary>
-        public readonly float S;
+        public readonly float H => _h;
 
         /// <summary>
-        /// The lightness component of the color, ranging from 0.0 to 1.0.
+        /// The saturation component value of the color ranging from 0.0 to 1.0.
         /// </summary>
-        public readonly float L;
+        public readonly float S => _s;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HslColor"/> value with the
-        /// specified hue, saturation and lightness components.
+        /// The lightness component value of the color ranging from 0.0 to 1.0.
         /// </summary>
-        /// <param name="h">The hue component (in degress) from 0.0 to 360.0.</param>
-        /// <param name="s">The saturation component from 0.0 to 1.0.</param>
-        /// <param name="l">The lightness component from 0.0 to 1.0.</param>
-        public HslColor(float h, float s, float l)
+        public readonly float L => _l;
+
+        /// <summary>
+        /// Normalizes a hue value to be within the range [0, 360).
+        /// Handles negative values by wrapping them around.
+        /// </summary>
+        /// <param name="h">The hue value to normalize.</param>
+        /// <returns>The normalized hue value.</returns>
+        private static float NormalizeHue(float h)
         {
-            H = Math.Clamp(h, 0.0f, 360.0f);
-            S = Math.Clamp(s, 0.0f, 1.0f);
-            L = Math.Clamp(l, 0.0f, 1.0f);
+            if (h < 0) return h + 360 * ((int)(h / 360) + 1);
+            return h % 360;
         }
 
         /// <summary>
-        /// Copies the values of this <see cref="HslColor"/> value to a new instance.
+        /// Initializes a new instance of the <see cref="HslColor"/> struct with the specified hue, saturation,
+        /// and lightness component values.
         /// </summary>
-        /// <param name="destination">
-        /// When this method returns, contains a copy of this <see cref="HslColor"/>.
-        /// </param>
+        /// <param name="h">The hue component value (in degrees) from 0.0 to 360.0.</param>
+        /// <param name="s">The saturation component value from 0.0 to 1.0.</param>
+        /// <param name="l">The lightness component value from 0.0 to 1.0.</param>
+        public HslColor(float h, float s, float l)
+        {
+            _h = Math.Clamp(h, 0.0f, 360.0f);
+            _s = Math.Clamp(s, 0.0f, 1.0f);
+            _l = Math.Clamp(l, 0.0f, 1.0f);
+        }
+
+        /// <summary>
+        /// Copies the values of this <see cref="HslColor"/> struct to a new instance.
+        /// </summary>
+        /// <param name="destination">When this method returns, contains a copy of this <see cref="HslColor"/>.</param>
+        [Obsolete("Use CopyToRef instead.  This will be removed in the next major SemVer release.")]
         public readonly void CopyTo(out HslColor destination)
         {
             destination = new HslColor(H, S, L);
         }
 
         /// <summary>
-        /// Copies this <see cref="HslColor"/> to the specified memory location using unsafe direct memory operations.
+        /// Copies the value of this <see cref="HslColor"/> struct to an existing destination.
         /// </summary>
-        /// <param name="destination">A pointer to the memory location where the color data will be copied.</param>
+        /// <param name="destination">A reference to the destination <see cref="HslColor"/> struct where values will be copied to.</param>
         /// <remarks>
-        /// This method performs a direct memory copy without invoking constructors or field validations, 
-        /// providing optimal performance for high-frequency operations.
+        /// This method directly modifies the internal components of the destination struct for improved performance.
+        /// Unlike typical operations on immutable structs, this method does not create a new instance but alters
+        /// the existing one in-place. It should be used only in scenarios where performance is critical.
         /// </remarks>
-        public readonly unsafe void CopyToUnsafe(HslColor* destination)
+        public readonly void CopyToRef(ref HslColor destination)
         {
-            Unsafe.Write(destination, Unsafe.As<HslColor, HslColor>(ref Unsafe.AsRef(in this)));
+            destination._h = _h;
+            destination._s = _s;
+            destination._l = _l;
         }
 
         /// <summary>
-        /// Destructures this <see cref="HslColor"/> into its constituent components.
+        /// Deconstructs this <see cref="HslColor"/>  into its hue, saturation, and lightness component values.
         /// </summary>
-        /// <param name="h">
-        /// When this method returns, contains the hue component of this <see cref="HslColor"/>.
-        /// </param>
-        /// <param name="s">
-        /// When this method returns, contains the saturation component of this <see cref="HslColor"/>.
-        /// </param>
-        /// <param name="l">
-        /// When this method returns, contains the lightness component of this <see cref="HslColor"/>.
-        /// </param>
+        /// <param name="h">When this method returns, contains the hue component value of this <see cref="HslColor"/>.</param>
+        /// <param name="s">When this method returns, contains the saturation component value of this <see cref="HslColor"/>.</param>
+        /// <param name="l">When this method returns, contains the lightness component value of this <see cref="HslColor"/>.</param>
+        [Obsolete("Will be removed in next major SemVer release.  Use Deconstruct instead.")]
         public readonly void Destructure(out float h, out float s, out float l)
+        {
+            h = H;
+            s = S;
+            l = L;
+        }
+
+        /// <summary>
+        /// Deconstructs this <see cref="HslColor"/>  into its hue, saturation, and lightness component values.
+        /// </summary>
+        /// <param name="h">When this method returns, contains the hue component value of this <see cref="HslColor"/>.</param>
+        /// <param name="s">When this method returns, contains the saturation component value of this <see cref="HslColor"/>.</param>
+        /// <param name="l">When this method returns, contains the lightness component value of this <see cref="HslColor"/>.</param>
+        public readonly void Deconstruct(out float h, out float s, out float l)
         {
             h = H;
             s = S;
@@ -128,70 +153,58 @@ namespace MonoGame.Extended
         /// </summary>
         /// <param name="value">The string to convert.</param>
         /// <returns>The <see cref="HslColor"/> represented by the string.</returns>
-        [Obsolete("This implicit conversion is deprecated and will be removed in a future version. Use HslColor.Parse() instead to make string parsing explicit and improve code readability.")]
+        [Obsolete("Use HslColor.Parse instead to make string parsing explicit and improve code readability.  This method will be removed in the next major SemVer release.")]
         public static implicit operator HslColor(string value)
         {
             return Parse(value);
         }
 
-        /// <summary>
-        /// Compares this instance to a specified <see cref="HslColor"/> and returns an integer that indicates whether 
-        /// the current instance precedes, follows, or occurs in the same position in the sort order as the specified 
-        /// <see cref="HslColor"/>.
-        /// </summary>
-        /// <param name="other">The <see cref="HslColor"/> to compare with this instance.</param>
-        /// <returns>A value that indicates the relative order of the objects being compared.</returns>
-        public int CompareTo(HslColor other)
+        /// <inheritdoc/>
+        /// <remarks>
+        /// This comparison uses a weighted approach that establishes a hierarchy of importance among the HSL components:
+        ///
+        /// <list type="bullet">
+        ///   <item>Hue is the primary sorting factor (weighted by 100)</item>
+        ///   <item>Saturation is the secondary sorting factor (weighted by 10)</item>
+        ///   <item>Lightness is the tertiary sorting factor (weight of 1)</item>
+        /// </list>
+        ///
+        /// This weighting ensures that differences in hue will dominate the comparison result, followed by
+        /// saturation, and then lightness, creating a sorting order that aligns with the perceptual importance
+        /// of each component in the HSL color space.
+        /// </remarks>
+        public readonly int CompareTo(HslColor other)
         {
 
-            return H.CompareTo(other.H) * 100 + S.CompareTo(other.S) * 10 + L.CompareTo(other.L);
+            return _h.CompareTo(other._h) * 100 +
+                   _s.CompareTo(other._s) * 10 +
+                   _l.CompareTo(other._l);
         }
 
-        /// <summary>
-        /// Determines whether the specified object is equal to the current HSL color.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current HSL color..</param>
-        /// <returns>
-        /// <see langword="true"/> if the specified object is a <see cref="HslColor"/> and is equal to the
-        /// current HSL color; otherwise, <see langword="false"/>.
-        /// </returns>
+        /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object obj)
         {
             return obj is HslColor other && Equals(other);
         }
 
-        /// <summary>
-        /// Determines whether the specified HSL color is equal to the current HSL color
-        /// </summary>
-        /// <param name="other">The HSL color to compare with the current HSL color.</param>
-        /// <returns>
-        /// <see langword="true"/> if the specified line segment is equal to the current line segment;
-        /// otherwise, <see langword="false"/>.
-        /// </returns>
-        public readonly bool Equals(HslColor other)
+        /// <inheritdoc/>
+        public readonly bool Equals(HslColor value)
         {
-            return H.Equals(other.H) &&
-                   L.Equals(other.L) &&
-                   S.Equals(other.S);
+            return H.Equals(value.H) &&
+                   L.Equals(value.L) &&
+                   S.Equals(value.S);
         }
 
-
-        /// <summary>
-        /// Returns the hash code for this HSL color.
-        /// </summary>
-        /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
-        public override int GetHashCode()
+        /// <inheritdoc/>
+        public override readonly int GetHashCode()
         {
             return H.GetHashCode() ^
                    S.GetHashCode() ^
                    L.GetHashCode();
         }
 
-        /// <summary>
-        /// Returns a string representation of this <see cref="HslColor"/>.
-        /// </summary>
-        /// <returns>A string representation of this <see cref="HslColor"/>.</returns>
-        public override string ToString()
+        /// <inheritdoc/>
+        public override readonly string ToString()
         {
             return string.Format(CultureInfo.InvariantCulture, "H:{0:N1}° S:{1:N1} L:{2:N1}",
                 H, 100 * S, 100 * L);
@@ -218,69 +231,82 @@ namespace MonoGame.Extended
 
 
         /// <summary>
-        /// Determines whether two <see cref="HslColor"/> instances are equal.
+        /// Determines whether two <see cref="HslColor"/> values are equal.
         /// </summary>
-        /// <param name="lhs">The first <see cref="HslColor"/> to compare.</param>
-        /// <param name="rhs">The second <see cref="HslColor"/> to compare.</param>
+        /// <param name="x">The first <see cref="HslColor"/> to compare.</param>
+        /// <param name="y">The second <see cref="HslColor"/> to compare.</param>
         /// <returns>
-        /// <see langword="true"/> if the HSL colors are equal; otherwise, <see langword="false"/>.
+        /// <see langword="true"/> if the <see cref="HslColor"/> values are equal; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool operator ==(HslColor lhs, HslColor rhs)
+        public static bool operator ==(HslColor x, HslColor y)
         {
-            return lhs.Equals(rhs);
+            return x.Equals(y);
         }
 
         /// <summary>
-        /// Determines whether two <see cref="HslColor"/> instances are not equal.
+        /// Determines whether two <see cref="HslColor"/> values are not equal.
         /// </summary>
-        /// <param name="lhs">The first <see cref="HslColor"/> to compare.</param>
-        /// <param name="rhs">The second <see cref="HslColor"/> to compare.</param>
+        /// <param name="x">The first <see cref="HslColor"/> to compare.</param>
+        /// <param name="y">The second <see cref="HslColor"/> to compare.</param>
         /// <returns>
-        /// <see langword="true"/> if the HSL colors are not equal; otherwise, <see langword="false"/>.
+        /// <see langword="true"/> if the <see cref="HslColor"/> values are not equal; otherwise, <see langword="false"/>.
         /// </returns>
-        public static bool operator !=(HslColor lhs, HslColor rhs)
+        public static bool operator !=(HslColor x, HslColor y)
         {
-            return !lhs.Equals(rhs);
+            return !x.Equals(y);
         }
 
         /// <summary>
-        /// Adds two <see cref="HslColor"/> instances together.
+        /// Adds two <see cref="HslColor"/> values together.
         /// </summary>
         /// <param name="a">The first <see cref="HslColor"/> to add.</param>
         /// <param name="b">The second <see cref="HslColor"/> to add.</param>
         /// <returns>
-        /// A new <see cref="HslColor"/> that is the sum of the two input colors.
+        /// A new <see cref="HslColor"/> value where the hue, saturation, and light component values are the sum of
+        /// the components of the two input colors.
         /// </returns>
         public static HslColor operator +(HslColor a, HslColor b)
         {
-            return new HslColor(a.H + b.H, a.S + b.S, a.L + b.L);
+            return new HslColor(
+                a._h + b._h,
+                a._s + b._s,
+                a._l + b._l
+            );
         }
 
         /// <summary>
-        /// Subtracts one <see cref="HslColor"/> from another.
+        /// Subtracts one <see cref="HslColor"/> value from another.
         /// </summary>
-        /// <param name="lhs">The <see cref="HslColor"/> to subtract from.</param>
-        /// <param name="rhs">The <see cref="HslColor"/> to subtract.</param>
-        /// <returns>A new <see cref="HslColor"/> that is the difference of the two input colors.</returns>
-        public static HslColor operator -(HslColor lhs, HslColor rhs)
+        /// <param name="a">The <see cref="HslColor"/> to subtract from.</param>
+        /// <param name="b">The <see cref="HslColor"/> to subtract.</param>
+        /// <returns>
+        /// A new <see cref="HslColor"/> value where the hue, saturation, and light component values are the difference
+        /// of the components of the two input colors.
+        /// </returns>
+        public static HslColor operator -(HslColor a, HslColor b)
         {
-            return new HslColor(lhs.H - rhs.H, lhs.S - rhs.S, lhs.L - rhs.L);
+            return new HslColor(
+                a._h - b._h,
+                a._s - b._s,
+                a._l - b._l
+            );
         }
 
         /// <summary>
         /// Linearly interpolates between two <see cref="HslColor"/> values.
         /// </summary>
-        /// <param name="color1">The first <see cref="HslColor"/>.</param>
-        /// <param name="color2">The second <see cref="HslColor"/>.</param>
-        /// <param name="amount">The interpolation factor. A value of 0 returns <paramref name="color1"/>, a value of 1 returns <paramref name="color2"/>.</param>
+        /// <param name="c1">The first <see cref="HslColor"/>.</param>
+        /// <param name="c2">The second <see cref="HslColor"/>.</param>
+        /// <param name="t">The interpolation factor. A value of 0 returns <paramref name="c1"/>, a value of 1 returns <paramref name="c2"/>.</param>
         /// <returns>The interpolated <see cref="HslColor"/>.</returns>
-        public static HslColor Lerp(HslColor color1, HslColor color2, float amount)
+        public static HslColor Lerp(HslColor c1, HslColor c2, float t)
         {
-            var h2 = color2.H >= color1.H ? color2.H : color2.H + 360;
+            // loop around if c2.H < c1.HF
+            var h2 = c2.H >= c1.H ? c2.H : c2.H + 360;
             return new HslColor(
-                color1.H + amount * (h2 - color1.H),
-                color1.S + amount * (color2.S - color1.S),
-                color1.L + amount * (color2.L - color1.L));
+                c1.H + t * (h2 - c1.H),
+                c1.S + t * (c2.S - c1.S),
+                c1.L + t * (c2.L - c1.L));
         }
 
         /// <summary>
@@ -290,43 +316,48 @@ namespace MonoGame.Extended
         /// <returns>The equivalent HSL color.</returns>
         public static HslColor FromRgb(Color color)
         {
-            // derived from http://www.geekymonkey.com/Programming/CSharp/RGB2HSL_HSL2RGB.htm
-            var r = color.R / 255f;
-            var g = color.G / 255f;
-            var b = color.B / 255f;
-            var h = 0f;
-            var s = 0f;
-            var l = 0f;
-            var v = Math.Max(r, g);
-            v = Math.Max(v, b);
+            float r = color.R / 255f;
+            float g = color.G / 255f;
+            float b = color.B / 255f;
 
-            var m = Math.Min(r, g);
-            m = Math.Min(m, b);
-            l = (m + v) / 2.0f;
+            float max = MathF.Max(r, MathF.Max(g, b));
+            float min = MathF.Min(r, MathF.Min(g, b));
+            float delta = max - min;
 
-            if (l <= 0.0)
+            float h = 0.0f;
+            float s = 0.0f;
+            float l = (max + min) * 0.5f;
+
+            if (MathF.Abs(delta) < float.Epsilon)
+            {
                 return new HslColor(h, s, l);
+            }
 
-            var vm = v - m;
-            s = vm;
+            if (MathF.Abs(r - max) < float.Epsilon)
+            {
+                h = (g - b) / delta;
+            }
+            else if (MathF.Abs(g - max) < float.Epsilon)
+            {
+                h = (b - r) / delta + 2.0f;
+            }
+            else if (MathF.Abs(b - max) < float.Epsilon)
+            {
+                h = (r - g) / delta + 4.0f;
+            }
 
-            if (s > 0.0)
-                s /= l <= 0.5f ? v + m : 2.0f - v - m;
+            h *= 60.0f;
+
+            h = NormalizeHue(h);
+
+            if (l <= 0.5f)
+            {
+                s = delta / (max + min);
+            }
             else
-                return new HslColor(h, s, l);
-
-            var r2 = (v - r) / vm;
-            var g2 = (v - g) / vm;
-            var b2 = (v - b) / vm;
-
-            if (Math.Abs(r - v) < float.Epsilon)
-                h = Math.Abs(g - m) < float.Epsilon ? 5.0f + b2 : 1.0f - g2;
-            else if (Math.Abs(g - v) < float.Epsilon)
-                h = Math.Abs(b - m) < float.Epsilon ? 1.0f + r2 : 3.0f - b2;
-            else
-                h = Math.Abs(r - m) < float.Epsilon ? 3.0f + g2 : 5.0f - r2;
-
-            h *= 60;
+            {
+                s = delta / (2.0f - max - min);
+            }
 
             return new HslColor(h, s, l);
         }
