@@ -3,6 +3,7 @@
 // See LICENSE file in the project root for full license information.
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGame.Extended.Particles.Profiles;
 
@@ -23,7 +24,7 @@ public abstract class Profile
     public abstract unsafe void GetOffsetAndHeading(Vector2* offset, Vector2* heading);
 
     /// <summary>
-    /// Creates a point profile that emits particles from a single point.
+    /// Creates a <see cref="PointProfile"/> that emits particles from a single point.
     /// </summary>
     /// <returns>A new <see cref="PointProfile"/> instance.</returns>
     public static Profile Point()
@@ -32,7 +33,7 @@ public abstract class Profile
     }
 
     /// <summary>
-    /// Creates a line profile that emits particles along a line segment.
+    /// Creates a <see cref="LineProfile"/> that emits particles along a line segment.
     /// </summary>
     /// <param name="axis">The direction vector of the line.</param>
     /// <param name="length">The length of the line segment.</param>
@@ -43,7 +44,19 @@ public abstract class Profile
     }
 
     /// <summary>
-    /// Creates a ring profile that emits particles from the perimeter of a circle.
+    /// Creates a <see cref="LineUniformProfile"/> that emits particles uniformly along a line segment with a fixed heading.
+    /// </summary>
+    /// <param name="axis">The direction vector of the line axis.</param>
+    /// <param name="length">The length fo the line segment.</param>
+    /// <param name="perpendicularDirection">The fixed heading direction for all particles spawned from the profile.</param>
+    /// <returns></returns>
+    public static Profile LineUniform(Vector2 axis, float length, Vector2 perpendicularDirection)
+    {
+        return new LineUniformProfile { Axis = axis, Length = length, PerpendicularDirection = perpendicularDirection };
+    }
+
+    /// <summary>
+    /// Creates a <see cref="RingProfile"/> that emits particles from the perimeter of a circle.
     /// </summary>
     /// <param name="radius">The radius of the ring.</param>
     /// <param name="radiate">The radiation pattern for particle headings.</param>
@@ -54,7 +67,7 @@ public abstract class Profile
     }
 
     /// <summary>
-    /// Creates a box profile that emits particles from the perimeter of a rectangle.
+    /// Creates a <see cref="BoxProfile"/> that emits particles from the perimeter of a rectangle.
     /// </summary>
     /// <param name="width">The width of the rectangle.</param>
     /// <param name="height">The height of the rectangle.</param>
@@ -65,7 +78,7 @@ public abstract class Profile
     }
 
     /// <summary>
-    /// Creates a box fill profile that emits particles from within a rectangular area.
+    /// Creates a <see cref="BoxFillProfile"/> that emits particles from within a rectangular area.
     /// </summary>
     /// <param name="width">The width of the rectangle.</param>
     /// <param name="height">The height of the rectangle.</param>
@@ -76,7 +89,7 @@ public abstract class Profile
     }
 
     /// <summary>
-    /// Creates a box uniform profile that emits particles from the perimeter of a rectangle with uniform density.
+    /// Creates a <see cref="BoxUniformProfile"/> that emits particles from the perimeter of a rectangle with uniform density.
     /// </summary>
     /// <param name="width">The width of the rectangle.</param>
     /// <param name="height">The height of the rectangle.</param>
@@ -87,7 +100,7 @@ public abstract class Profile
     }
 
     /// <summary>
-    /// Creates a circle profile that emits particles from within a circular area.
+    /// Creates a <see cref="CircleProfile"/> that emits particles from within a circular area.
     /// </summary>
     /// <param name="radius">The radius of the circle.</param>
     /// <param name="radiate">The radiation pattern for particle headings.</param>
@@ -98,7 +111,7 @@ public abstract class Profile
     }
 
     /// <summary>
-    /// Creates a spray profile that emits particles in a directional cone.
+    /// Creates a <see cref="SprayProfile"/> that emits particles in a directional cone.
     /// </summary>
     /// <param name="direction">The central direction of the spray.</param>
     /// <param name="spread">The angular spread of the spray, in radians.</param>
@@ -108,10 +121,7 @@ public abstract class Profile
         return new SprayProfile { Direction = direction, Spread = spread };
     }
 
-    /// <summary>
-    /// Returns a string that represents the current profile.
-    /// </summary>
-    /// <returns>A string containing the type name of the profile.</returns>
+    /// <inheritdoc />
     public override string ToString()
     {
         return GetType().Name;

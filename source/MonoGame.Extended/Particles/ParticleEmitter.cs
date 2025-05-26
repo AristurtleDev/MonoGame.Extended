@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.Graphics;
 using MonoGame.Extended.Particles.Data;
 using MonoGame.Extended.Particles.Modifiers;
 using MonoGame.Extended.Particles.Primitives;
@@ -92,7 +93,7 @@ public sealed unsafe class ParticleEmitter : IDisposable
     /// </summary>
     /// <remarks>
     /// When set to <see langword="true"/>, the emitter will periodically emit particles based on the
-    /// <see cref="AutoTriggerFrequency"/> property, without requiring explicit calls to <see cref="Trigger"/>.
+    /// <see cref="AutoTriggerFrequency"/> property, without requiring explicit calls to <see cref="Trigger(Vector2, float)"/>.
     /// </remarks>
     public bool AutoTrigger;
 
@@ -148,21 +149,9 @@ public sealed unsafe class ParticleEmitter : IDisposable
     public Profile Profile;
 
     /// <summary>
-    /// Gets or sets the key identifying the texture to use when rendering particles from this emitter.
+    /// The <see cref="Texture2DRegion"/> to use when rendering particles from this emitter.
     /// </summary>
-    /// <remarks>
-    /// This key is typically used by the rendering system to look up the appropriate texture resource.
-    /// </remarks>
-    public string TextureKey;
-
-    /// <summary>
-    /// Gets or sets the source rectangle within the texture that defines the appearance of particles.
-    /// </summary>
-    /// <remarks>
-    /// When set to <see langword="null"/>, the entire texture is used. Otherwise, only the specified
-    /// portion of the texture is used for rendering particles.
-    /// </remarks>
-    public Rectangle? SourceRectangle;
+    public Texture2DRegion TextureRegion;
 
     /// <summary>
     /// Gets or sets the order in which particles are rendered within this emitter.
@@ -199,8 +188,7 @@ public sealed unsafe class ParticleEmitter : IDisposable
     {
         LifeSpan = 1.0f;
         Name = nameof(ParticleEmitter);
-        TextureKey = string.Empty;
-        SourceRectangle = null;
+        TextureRegion = null;
         Buffer = new ParticleBuffer(initialCapacity);
         Profile = Profile.Point();
         Modifiers = new List<Modifier>();

@@ -4,7 +4,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
+using Microsoft.Xna.Framework;
 using System.Runtime.InteropServices;
 
 namespace MonoGame.Extended.Particles.Primitives;

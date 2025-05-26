@@ -6,8 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
-using System.Text.Json.Serialization;
+using Microsoft.Xna.Framework;
 using MonoGame.Extended.Particles.Primitives;
 
 namespace MonoGame.Extended.Particles;
@@ -69,14 +68,12 @@ public class ParticleEffect : IDisposable
     /// Gets a value indicating whether this <see cref="ParticleEffect"/> has been disposed.
     /// </summary>
     /// <value><see langword="true"/> if the effect has been disposed; otherwise, <see langword="false"/>.</value>
-    [JsonIgnore]
     public bool IsDisposed { get; private set; }
 
     /// <summary>
     /// Gets the total number of active particles across all emitters in this effect.
     /// </summary>
     /// <value>The sum of <see cref="ParticleEmitter.ActiveParticles"/> for all emitters in the effect.</value>
-    [JsonIgnore]
     public int ActiveParticles
     {
         get
@@ -129,6 +126,11 @@ public class ParticleEffect : IDisposable
             Trigger(position);
             time += triggerPeriod;
         }
+    }
+
+    public void Update(GameTime gameTime)
+    {
+        Update((float)gameTime.ElapsedGameTime.TotalSeconds);
     }
 
     /// <summary>
